@@ -1,0 +1,14 @@
+"LAYOUT" COMUM: BENEFÍCIOS
+
+Partilha de "Layout" vai para além da apresentação 
+(do "look-and-feel"):
+
+* Informação meta consistente (no head)
+
+* Os mesmos scripts JS e CSS e pela mesma ordem
+
+* "Analíticos" consistentes (eg, Google Analytics)
+
+* Estrutura: locais bem definidos para inserir JS e CSS
+  à medida de cada página (se tal for necessário)
+  
