@@ -27,12 +27,12 @@ async def course_details(course_id: int):
 #:
 
 def course_details_viewmodel(course_id: int):
-    course = next((c for c in course_service.available_courses() if c.id == course_id), None)
-    if course: 
-        return base_viewmodel_with({'course': course})
+    if course := course_service.get_course_by_id(course_id):
+        return base_viewmodel_with({
+            'course': course
+        })
     return base_viewmodel_with({
         'error': True,
-        'error_msg': 'Course not found'
+        'error_msg': 'Course not found',
     })
 #:
-

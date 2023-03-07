@@ -102,3 +102,11 @@ def available_courses(count: int = 0) -> List[Course]:
     ]
     return courses if count <= 0 else courses[:count]
 #:
+
+def get_course_by_id(course_id: int) -> Course | None:
+    courses = available_courses(10000)
+    for course in courses:
+        if course.id == course_id:
+            return course
+    return None
+#:
