@@ -9,9 +9,11 @@ class Course:
     price: dec
     name: str
     summary: str
+    description: str
     trainer_id: int
     trainer_name: str
     schedule: str
+    available_seats: int
 #:
 
 @dataclass

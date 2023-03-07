@@ -4,7 +4,7 @@ def base_viewmodel():
         'error': None,
         'error_msg': None,
         'user_id': None,
-        'is_logged_in': True,
+        'is_logged_in': False,
     }
 #:
 
