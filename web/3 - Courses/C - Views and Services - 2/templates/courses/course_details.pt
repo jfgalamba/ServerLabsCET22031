@@ -18,7 +18,7 @@
 
                         <div class="row">
                             <div class="col-lg-8">
-                                <img src="/static/assets/img/courses/course-${id}-details.jpg" class="img-fluid" alt="">
+                                <img src="/static/assets/img/courses/course-${course.id}-details.jpg" class="img-fluid" alt="">
                                 <h3>${course.name}</h3>
                                 <p>
                                     ${course.description}
