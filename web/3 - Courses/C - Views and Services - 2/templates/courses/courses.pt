@@ -24,7 +24,7 @@
                                 <div class="course-content">
                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                         <h4>${course.category}</h4>
-                                        <p class="price">${course.price}</p>
+                                        <p class="price">${course.price} €</p>
                                     </div>
 
                                     <h3><a href="/courses/${course.id}">${course.name}</a></h3>
