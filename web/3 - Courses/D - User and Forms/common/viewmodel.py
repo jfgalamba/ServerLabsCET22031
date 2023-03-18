@@ -19,7 +19,7 @@ class ViewModel(dict):
             'is_logged_in': user_id is not None,
         }
         all.update(kargs)
-        super().__init__(self, *args, **all)
+        super().__init__(*args, **all)
     #:
 
     def __getattr__(self, name: str) -> Any:
