@@ -1,6 +1,6 @@
 from datetime import date
 
-from fastapi import APIRouter, Request, responses, status
+from fastapi import APIRouter, Request, Response, responses, status
 from fastapi_chameleon import template
 
 from services import student_service
@@ -45,9 +45,7 @@ async def post_register(request: Request):
     if vm.error:
         return vm
 
-    response = responses.RedirectResponse(url='/', status_code = status.HTTP_302_FOUND)
-    set_auth_cookie(response, vm.new_student_id)
-    return response
+    return exec_login(vm)
 #:
 
 async def post_register_viewmodel(request: Request):
@@ -119,9 +117,7 @@ async def post_login(request: Request):
     if vm.error:
         return vm
 
-    response = responses.RedirectResponse(url='/', status_code=status.HTTP_302_FOUND)
-    set_auth_cookie(response, vm.student_id)
-    return response
+    return exec_login(vm)
 #:
 
 async def post_login_viewmodel(request: Request) -> ViewModel:
@@ -147,6 +143,12 @@ async def post_login_viewmodel(request: Request) -> ViewModel:
     #:
 
     return vm
+#:
+
+def exec_login(vm: ViewModel) -> Response:
+    response = responses.RedirectResponse(url = '/', status_code = status.HTTP_302_FOUND)
+    set_auth_cookie(response, vm.student_id)
+    return response
 #:
 
 @router.get('/account/logout')                     # type: ignore
