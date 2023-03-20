@@ -1,0 +1,66 @@
+<div metal:use-macro="load: ../shared/_layout.pt">
+
+    <__css_scripts__ metal:fill-slot="additional_css" tal:omit-tag="True">
+        <link rel="stylesheet" href="/static/assets/css/account.css">
+    </__css_scripts__>
+
+    <__content__ metal:fill-slot="content" tal:omit-tag="True">
+
+        <main id="main" class="account-main">
+            <section class="vh-100 bg-image">
+                <div class="mask d-flex align-items-center h-100 gradient-custom-3">
+                    <div class="container h-100">
+                        <div class="row d-flex justify-content-center align-items-center h-100">
+                            <div class="col-12 col-md-9 col-lg-7 col-xl-6">
+                                <div class="card" style="border-radius: 15px;">
+                                    <div class="card-body p-5">
+                                        <h2 class="text-uppercase text-center mb-5">Alterar Dados da Conta</h2>
+
+                                        <form action="/account" method="POST" class="account-form">
+
+                                            <div class="form-outline mb-4">
+                                                <input type="text" name="name" class="form-control form-control-lg" required
+                                                    disabled
+                                                    value="${name}">
+                                                <label class="form-label" for="form3Example1cg">O Seu Nome</label>
+                                            </div>
+
+                                            <div class="form-outline mb-4">
+                                                <input type="email" name="email" class="form-control form-control-lg" required
+                                                    value="${email}">
+                                                <label class="form-label" for="form3Example3cg">O Seu Email</label>
+                                            </div>
+
+                                            <div class="form-outline mb-4">
+                                                <input type="password" name="current_password" class="form-control form-control-lg"
+                                                       required>
+                                                <label class="form-label" for="form3Example4cg">Senha Actual</label>
+                                            </div>
+
+                                            <div class="form-outline mb-4">
+                                                <input type="password" name="new_password" class="form-control form-control-lg">
+                                                <label class="form-label" for="form3Example4cg">Nova senha</label>
+                                            </div>
+
+                                            <div class="form-outline mb-4">
+                                                <input type="password" id="repeat-password" class="form-control form-control-lg">
+                                                <label class="form-label" for="repeat-password">Repita a nova senha</label>
+                                            </div>
+
+                                            <div tal:condition="error" class="d-flex justify-content-center form-outline mb-4 error-msg">${error_msg}</div>
+
+                                            <div class="d-flex justify-content-center">
+                                                <button type="submit"
+                                                    class="btn btn-success btn-block btn-lg get-started-btn text-body">Alterar</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+          </main><!-- End #main -->
+    </__content__>
+</div>

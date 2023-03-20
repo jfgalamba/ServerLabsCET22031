@@ -2,8 +2,10 @@ from datetime import date
 from random import randrange
 from typing import List
 
-from data.models import Testimonial, Student
-from common.auth import hash_password
+from data.models import (
+    Student,
+    Testimonial, 
+)
 from common.common import (
     is_valid_email,
     find_in,
@@ -33,6 +35,21 @@ def create_account(
     return student
 #:
 
+def update_account(
+        id: int,
+        current_password: str,
+        email: str | None = None,
+        new_password: str | None = None,
+) -> Student:
+    if not (student := get_student_by_id(id)):
+        raise ValueError(f'Invalid id {id}.')
+    if not password_matches(student, current_password):
+        raise ValueError(f"Password doesn't match.")
+    student.email = email if email else student.email
+    student.password = hash_password(new_password) if new_password else student.password
+    return student
+#:
+
 def get_student_by_email(email: str) -> Student | None:
     if not is_valid_email(email):
         raise ValueError(f'Invalid email address: {email}')
@@ -40,13 +57,21 @@ def get_student_by_email(email: str) -> Student | None:
            # em JS: _students.find(student => student.email === email)
 #:
 
+def get_student_by_id(student_id: int) -> Student | None:
+    return find_in(_students, lambda student: student.id == student_id)
+#:
+
 def authenticate_student_by_email(email: str, password: str) -> Student | None:
     if not is_valid_email(email):
         raise ValueError(f'Invalid email address: {email}')
     if student := get_student_by_email(email):
-        if hash_password(password) == student.password:
+        if password_matches(student, password):
             return student
     return None
+#:
+
+def password_matches(student: Student, password: str) -> bool:
+    return student.password == hash_password(password)
 #:
 
 def get_testimonials(count: int) -> List[Testimonial]:
@@ -82,4 +107,8 @@ def get_testimonials(count: int) -> List[Testimonial]:
             text = 'Quis quorum aliqua sint quem legam fore sunt eram irure aliqua veniam tempor noster veniam enim culpa labore duis sunt culpa nulla illum cillum fugiat legam esse veniam culpa fore nisi cillum quid.',
         ),
     ][:count]
+#:
+
+def hash_password(password: str) -> str:
+    return password + '-hashpw'
 #:

@@ -11,8 +11,12 @@ from common.common import (
     is_valid_iso_date,
 )
 from common.viewmodel import ViewModel
-from common.fastapi_utils import form_field_as_str
-from common.auth import set_auth_cookie, delete_auth_cookie
+from common.fastapi_utils import form_field_as_str, global_request
+from common.auth import (
+    get_current_user,
+    set_auth_cookie, 
+    delete_auth_cookie,
+)
 
 
 MIN_DATE = date.fromisoformat('1920-01-01')
@@ -27,10 +31,10 @@ async def register():
 
 def register_viewmodel():
     return ViewModel(
-        name = '',
-        email = '',
-        password = '',
-        birth_date = '',
+        name = 'Alberto',
+        email = 'alb@mail.com',
+        password = 'abc',
+        birth_date = '2022-01-01',
         min_date = MIN_DATE,
         max_date = date.today(),
         checked = False,
@@ -45,7 +49,7 @@ async def post_register(request: Request):
     if vm.error:
         return vm
 
-    return exec_login(vm)
+    return exec_login(vm.new_student_id)
 #:
 
 async def post_register_viewmodel(request: Request):
@@ -117,7 +121,7 @@ async def post_login(request: Request):
     if vm.error:
         return vm
 
-    return exec_login(vm)
+    return exec_login(vm.student_id)
 #:
 
 async def post_login_viewmodel(request: Request) -> ViewModel:
@@ -128,26 +132,27 @@ async def post_login_viewmodel(request: Request) -> ViewModel:
         student_id = None,
     )
     if not is_valid_email(vm.email):
-        vm.error, vm.error_msg = True, 'Invalid user or password!'
+        vm.error_msg = 'Endereço de email inválido!'
     #:
     elif not is_valid_password(vm.password):
-        vm.error, vm.error_msg = True, 'Invalid password!'
+        vm.error_msg = 'Senha inválida!'
     #:
     elif not (student := 
             student_service.authenticate_student_by_email(vm.email, vm.password)):
-        vm.error, vm.error_msg = True, 'User not found!'
+        vm.error_msg = 'Utilizador ou senha inválida!'
     #:
     else:
-        vm.error, vm.error_msg = False, ''
+        vm.error_msg = ''
         vm.student_id = student.id
     #:
 
+    vm.error = bool(vm.error_msg)
     return vm
 #:
 
-def exec_login(vm: ViewModel) -> Response:
+def exec_login(user_id: int) -> Response:
     response = responses.RedirectResponse(url = '/', status_code = status.HTTP_302_FOUND)
-    set_auth_cookie(response, vm.student_id)
+    set_auth_cookie(response, user_id)
     return response
 #:
 
@@ -159,8 +164,74 @@ async def logout():
 #:
 
 @router.get('/account')                            # type: ignore
-async def index():
-    return {
+@template()
+async def account():
+    return account_viewmodel()
+#:
 
-    }
+def account_viewmodel() -> ViewModel:
+    student = get_current_user()
+    # Current user must exist because we're in an authenticated
+    # view context.
+    assert student is not None
+
+    return ViewModel(
+        name = student.name,
+        email = student.email,
+    )
+#:
+
+@router.post('/account')                            # type: ignore
+@template(template_file='account/account.pt')
+async def update_account(request: Request):
+    vm = await update_account_viewmodel(request)
+
+    if vm.error:
+        return vm
+
+    return responses.RedirectResponse(url = '/', status_code = status.HTTP_302_FOUND)
+#:
+
+async def update_account_viewmodel(request: Request):
+    student = get_current_user()
+    assert student is not None
+
+    form_data = await request.form()
+    student = get_current_user()
+    assert student is not None
+
+    vm = ViewModel()
+    vm.error_msg = ''
+    vm.name = student.name
+    vm.email = form_field_as_str(form_data, 'email').strip()
+    current_password = form_field_as_str(form_data, 'current_password').strip()
+    new_email = None if vm.email == student.email else vm.email
+    new_password = form_field_as_str(form_data, 'new_password').strip()
+
+    if not student_service.password_matches(student, current_password):
+        vm.error_msg = 'Senha inválida!'
+    #:
+    elif new_email:
+        if not is_valid_email(new_email):
+            vm.error_msg = f'Endereço de email {new_email} inválido!'
+        elif student_service.get_student_by_email(new_email):
+            vm.error_msg = f'Endereço de email {new_email} já existe!'
+    #:
+    elif student_service.password_matches(student, new_password):
+        vm.error_msg = 'Nova senha é igual à anterior!'
+    #:
+    elif not is_valid_password(new_password):
+        vm.error_msg = 'Senha inválida!'
+    #:
+
+    vm.error = bool(vm.error_msg)
+    if not vm.error:
+        student_service.update_account(
+            student.id, 
+            current_password, 
+            new_email, 
+            new_password,
+        )
+
+    return vm
 #:

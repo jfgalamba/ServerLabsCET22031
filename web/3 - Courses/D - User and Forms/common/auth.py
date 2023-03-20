@@ -1,16 +1,32 @@
 all = (
+    'get_current_user',
+    'get_auth_from_cookie',
     'set_auth_cookie',
-    'hash_password',
+    'delete_auth_cookie',
 )
 
 
 from hashlib import sha512
-from fastapi import Request, Response
+
+from fastapi import (
+    Request, 
+    Response,
+)
+
+from data.models import Student
+from common.fastapi_utils import global_request
+from services import student_service
 
 
 AUTH_COOKIE_NAME = 'user_id'
 SESSION_COOKIE_MAX_AGE = 86400_00   # in seconds (~100 days)
 SECRET_KEY = '8e10d234a1f8eb6f9dd6dfc3a325a0613ad2e620e5b8844cb011470492422bee'
+
+def get_current_user() -> Student | None:
+    if student_id := get_auth_from_cookie(global_request.get()):
+        return student_service.get_student_by_id(student_id)
+    return None
+#:
 
 def set_auth_cookie(response: Response, user_id: int):
     cookie_value = f'{str(user_id)}:{hash_cookie_value(str(user_id))}'
@@ -47,8 +63,4 @@ def delete_auth_cookie(response: Response):
 
 def hash_cookie_value(cookie_value: str) -> str:
     return sha512(f'{cookie_value}{SECRET_KEY}'.encode('utf-8')).hexdigest()
-#:
-
-def hash_password(password: str) -> str:
-    return password + '-hashpw'
 #:
