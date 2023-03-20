@@ -193,9 +193,6 @@ async def update_account(request: Request):
 #:
 
 async def update_account_viewmodel(request: Request):
-    student = get_current_user()
-    assert student is not None
-
     form_data = await request.form()
     student = get_current_user()
     assert student is not None
