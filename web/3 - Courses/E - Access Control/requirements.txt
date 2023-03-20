@@ -1,0 +1,6 @@
+fastapi
+uvicorn[standard]
+chameleon
+fastapi-chameleon
+python-multipart
+aiofiles
